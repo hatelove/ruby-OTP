@@ -14,11 +14,16 @@ describe 'Holiday' do
   before do
     @holiday = Holiday.new
   end
-
   it 'is xmas' do
     given_today(12, 25)
     response_should_be('Merry Xmas')
   end
+
+  it 'is not xmas' do
+    given_today(11, 25)
+    response_should_be('Today is not Xmas')
+  end
+
 end
 
 require_relative '../lib/holiday.rb'
