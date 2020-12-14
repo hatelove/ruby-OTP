@@ -1,12 +1,16 @@
 # frozen_string_literals: true
 
 class AuthenticationService
-  def valid?(account, password)
-    profile_dao = ProfileDao.new
-    password_for_dao = profile_dao.password(account)
+  attr_reader :profile, :token
 
-    rsa_token_dao = RasTokenDao.new
-    random_code = rsa_token_dao.random_token(account)
+  def initialize(profile = nil, token = nil)
+    @profile = profile || ProfileDao.new
+    @token = token || RasTokenDao.new
+  end
+
+  def valid?(account, password)
+    password_for_dao = profile.password(account)
+    random_code = token.random_token(account)
 
     valid_password = password_for_dao + random_code
     is_valid = valid_password == password
@@ -17,4 +21,5 @@ class AuthenticationService
       false
     end
   end
+
 end
