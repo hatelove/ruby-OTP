@@ -19,11 +19,16 @@ def should_be_invalid(account, password)
   expect(is_valid).to be(false)
 end
 
+RSpec::Matchers.define :message_matcher do |account, status|
+  match { |message| message.include?(account) && message.include?(status) }
+end
+
 describe 'Authentication' do
   before do
     @profile = double
     @token = double
-    @authentication = AuthenticationService.new(@profile, @token)
+    @notification = spy
+    @authentication = AuthenticationService.new(@profile, @token, @notification)
   end
 
   it 'should be valid' do
@@ -36,6 +41,15 @@ describe 'Authentication' do
     given_password('joey', '91')
     given_otp('000000')
     should_be_invalid('joey', 'wrong password')
+  end
+
+  it 'should notify user when invalid' do
+    given_password('joey', '91')
+    given_otp('000000')
+    @authentication.valid?('joey', 'wrong password')
+    expect(@notification).to have_received(:save)
+                               .with(message_matcher('joey', 'login failed'))
+                               .once
   end
 
 end
