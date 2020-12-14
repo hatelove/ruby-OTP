@@ -1,16 +1,23 @@
 require 'rspec'
 require 'date'
 
+def given_today(month, day)
+  allow(Date).to receive(:today).and_return(Date.new(2000, month, day))
+end
+
+def response_should_be(expected)
+  response = @holiday.say_hello
+  expect(response).to eq(expected)
+end
+
 describe 'Holiday' do
   before do
-    # Do nothing
+    @holiday = Holiday.new
   end
 
   it 'is xmas' do
-    allow(Date).to receive(:today).and_return(Date.new(2000, 12, 25))
-    holiday = Holiday.new
-    response = holiday.say_hello
-    expect(response).to eq('Merry Xmas')
+    given_today(12, 25)
+    response_should_be('Merry Xmas')
   end
 end
 
