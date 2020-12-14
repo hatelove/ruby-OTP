@@ -23,6 +23,18 @@ RSpec::Matchers.define :message_matcher do |account, status|
   match { |message| message.include?(account) && message.include?(status) }
 end
 
+def when_invalid(account)
+  given_password(account, '91')
+  given_otp('000000')
+  @authentication.valid?(account, 'wrong password')
+end
+
+def should_notify(account, status)
+  expect(@notification).to have_received(:save)
+                             .with(message_matcher(account, status))
+                             .once
+end
+
 describe 'Authentication' do
   before do
     @profile = double
@@ -44,12 +56,8 @@ describe 'Authentication' do
   end
 
   it 'should notify user when invalid' do
-    given_password('joey', '91')
-    given_otp('000000')
-    @authentication.valid?('joey', 'wrong password')
-    expect(@notification).to have_received(:save)
-                               .with(message_matcher('joey', 'login failed'))
-                               .once
+    when_invalid('joey')
+    should_notify('joey', 'login failed')
   end
 
 end
