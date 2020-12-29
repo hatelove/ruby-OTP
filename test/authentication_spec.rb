@@ -43,21 +43,27 @@ describe 'Authentication' do
     @authentication = AuthenticationService.new(@profile, @token, @notification)
   end
 
-  it 'should be valid' do
-    given_password('joey', '91')
-    given_otp('000000')
-    should_be_valid('joey', '91000000')
-  end
+  describe '#valid' do
+    context 'when valid' do
+      it 'should return true' do
+        given_password('joey', '91')
+        given_otp('000000')
+        should_be_valid('joey', '91000000')
+      end
+    end
 
-  it 'should be invalid' do
-    given_password('joey', '91')
-    given_otp('000000')
-    should_be_invalid('joey', 'wrong password')
-  end
+    context 'when invalid' do
+      it 'should return false' do
+        given_password('joey', '91')
+        given_otp('000000')
+        should_be_invalid('joey', 'wrong password')
+      end
 
-  it 'should notify user when invalid' do
-    when_invalid('joey')
-    should_notify('joey', 'login failed')
+      it 'should notify user' do
+        when_invalid('joey')
+        should_notify('joey', 'login failed')
+      end
+    end
   end
 
 end
